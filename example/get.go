@@ -1,0 +1,39 @@
+package main
+
+import (
+	"encoding/json"
+	"github.com/go-chi/chi/v5"
+	"go-rest/pkg/openapi"
+	"net/http"
+)
+
+type User struct {
+	UserID string `json:"userID"`
+}
+
+var MyGet = &openapi.Get{
+	Summary:        "Get User",
+	Description:    "Get User with given ID",
+	OperationID:    "GetMyTest",
+	Tags:           []string{"UserService"},
+	Authentication: map[string][]string{"mybasic": nil, "mybearer": {"users:read"}},
+	Response: map[string]openapi.MethodResponse{
+		"200": {
+			Description: "The response with userID",
+			Value: &User{
+				UserID: "exampleID",
+			},
+		},
+	},
+	Headers: []openapi.Parameter{{Description: "My custom header", Name: "test-header", Required: false, Type: openapi.INTEGER}},
+	Path: openapi.NewPathBuilder().
+		Add("users").
+		AddParameter("userId", openapi.STRING, "UserID").
+		WithQueryParameter("filter", openapi.STRING, "Filter stuff", false),
+	HandlerFunc: func(writer http.ResponseWriter, request *http.Request) {
+		userID := chi.URLParam(request, "userID")
+		user := &User{UserID: userID}
+		resp, _ := json.Marshal(user)
+		_, _ = writer.Write(resp)
+	},
+}
