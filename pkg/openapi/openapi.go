@@ -268,16 +268,15 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 
 func (a *API) handleResponse(respDesc string, resp interface{}, i string, ops *Operation) {
 	if resp != nil {
-
 		schema := a.jsonschemaRefl.Reflect(resp)
 		//TODO allow rename of objects
-		/*		for s, _ := range schema.Definitions {
+		/*for s, _ := range schema.Definitions {
 				fmt.Printf("Change key %s with name %s", s, name)
 				schema.Definitions[name] = schema.Definitions[s]
 				schema.Ref = strings.Replace(schema.Ref, s, name, 1)
 				delete(schema.Definitions, s)
 				break
-			}*/
+		}*/
 
 		for s, t := range schema.Definitions {
 			a.OpenAPI.Components.Schemas[s] = t
@@ -285,7 +284,7 @@ func (a *API) handleResponse(respDesc string, resp interface{}, i string, ops *O
 
 		ops.Responses[i] = &Response{
 			Content: map[string]*MediaType{
-				"application/json": {Schema: &SchemaRef{Ref: schema.Ref}, Example: resp},
+				"application/json": {Schema: &SchemaRef{Value: schema.Type}, Example: resp},
 			},
 			Description: respDesc,
 		}
@@ -347,7 +346,7 @@ func (a *API) ToJSON() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return []byte(strings.ReplaceAll(string(j), "#/definitions", "#/components/schemas")), nil
+	return a.patchOpenApi(j), nil
 }
 
 func (a *API) ToYAML() ([]byte, error) {
@@ -373,7 +372,7 @@ func (a *API) ToYAML() ([]byte, error) {
 		return nil, err
 	}
 
-	return []byte(strings.ReplaceAll(string(y), "#/definitions", "#/components/schemas")), nil
+	return y, nil
 }
 
 func (a *API) Validate() error {
@@ -414,4 +413,12 @@ func (a *API) OpenAPIHandlerFunc() (http.HandlerFunc, error) {
 
 func (a *API) DefaultResponse(response *MethodResponse) {
 	a.defaultResponse = response
+}
+
+func (a *API) patchOpenApi(openapi []byte) []byte {
+	// Replace json definitions with open api schemas
+	patch := strings.ReplaceAll(string(openapi), "#/definitions", "#/components/schemas")
+	// Remove unneeded json draft version
+	patch = strings.ReplaceAll(patch, `"$schema": "http://json-schema.org/draft-04/schema#",`, "")
+	return []byte(patch)
 }

@@ -11,6 +11,8 @@ type User struct {
 	UserID string `json:"userID"`
 }
 
+type UserList = []string
+
 var MyGet = &openapi.Get{
 	Summary:        "Get User",
 	Description:    "Get User with given ID",
@@ -20,9 +22,15 @@ var MyGet = &openapi.Get{
 	Response: map[string]openapi.MethodResponse{
 		"200": {
 			Description: "The response with userID",
-			Value: &User{
-				UserID: "exampleID",
-			},
+			Value:       UserList{"test"},
+		},
+		"201": {
+			Description: "The response with userID",
+			Value:       &[]User{{"test"}},
+		},
+		"202": {
+			Description: "The response with userID",
+			Value:       &User{"test"},
 		},
 	},
 	Headers: []openapi.Parameter{{Description: "My custom header", Name: "test-header", Required: false, Type: openapi.INTEGER}},
