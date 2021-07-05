@@ -1,4 +1,4 @@
-module go-rest
+module github.com/Nightapes/go-rest
 
 go 1.15
 
