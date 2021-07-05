@@ -5,13 +5,13 @@ Generate openapi definition from code.
 ## Usage
 
 ```go
-import "go-rest/pkg/openapi"
+import "github.com/Nightapes/go-rest/pkg/openapi"
 ```
 
 ```go
 package main 
 
-import "go-rest/pkg/openapi"
+import "github.com/Nightapes/go-rest/pkg/openapi"
 
 var GetUser = &openapi.Get{
 	Summary:        "Get User",

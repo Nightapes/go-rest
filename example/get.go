@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/Nightapes/go-rest/pkg/openapi"
 	"github.com/go-chi/chi/v5"
-	"go-rest/pkg/openapi"
 	"net/http"
 )
 
