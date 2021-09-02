@@ -291,7 +291,15 @@ func (a *API) handleResponse(respDesc string, resp interface{}, i string, ops *O
 			},
 			Description: respDesc,
 		}
+		return
 	}
+
+	if respDesc != "" {
+		ops.Responses[i] = &Response{
+			Description: respDesc,
+		}
+	}
+
 }
 
 func (a *API) AddServer(url, description string) {

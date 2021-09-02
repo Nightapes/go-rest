@@ -28,9 +28,8 @@ var MyGet = &openapi.Get{
 			Description: "The response with userID",
 			Value:       &[]User{{"test"}},
 		},
-		"202": {
+		"204": {
 			Description: "The response with userID",
-			Value:       &User{"test"},
 		},
 	},
 	Headers: []openapi.Parameter{{Description: "My custom header", Name: "test-header", Required: false, Type: openapi.INTEGER}},
