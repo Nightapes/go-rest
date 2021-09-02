@@ -56,32 +56,42 @@ func NewOpenAPI() *API {
 	return &API{
 		validate: validator.New(),
 		handlers: map[string]map[string]HandlerConfig{},
-		jsonschemaRefl: &jsonschema.Reflector{TypeMapper: func(r reflect.Type) *jsonschema.Type {
-			if r.Kind() == reflect.Map {
-				return &jsonschema.Type{
-					Type:                 "object",
-					AdditionalProperties: []byte("true"),
+		jsonschemaRefl: &jsonschema.Reflector{
+			TypeMapper: func(r reflect.Type) *jsonschema.Type {
+				if r.Kind() == reflect.Map {
+					return &jsonschema.Type{
+						Type:                 "object",
+						AdditionalProperties: []byte("true"),
+					}
 				}
-			}
-			modelType := reflect.TypeOf((*Enum)(nil)).Elem()
+				modelType := reflect.TypeOf((*Enum)(nil)).Elem()
 
-			if r.Implements(modelType) {
-				enumPointer := reflect.New(r)
-				enumValue := enumPointer.Elem()
-				enumInterface := enumValue.Interface()
-				enumObject := enumInterface.(Enum)
-				if len(enumObject.GetValues()) == 0 {
-					log.Printf("Could not set enum values, no values found in type %s", r.Kind().String())
-					return nil
-				}
-				return &jsonschema.Type{
-					Type: reflect.TypeOf(enumObject.GetValues()[0]).Kind().String(),
-					Enum: enumObject.GetValues(),
-				}
-			}
+				if r.Implements(modelType) {
+					enumPointer := reflect.New(r)
+					enumValue := enumPointer.Elem()
+					enumInterface := enumValue.Interface()
+					enumObject := enumInterface.(Enum)
+					if len(enumObject.GetValues()) == 0 {
+						log.Printf("Could not set enum values, no values found in type %s", r.Kind().String())
+						return nil
+					}
 
-			return nil
-		}},
+					definition := &jsonschema.Type{
+						Enum: enumObject.GetValues(),
+						Type: reflect.TypeOf(enumObject.GetValues()[0]).Kind().String(),
+					}
+
+					return &jsonschema.Type{
+
+						Ref: "#/definitions/" + r.Name(),
+						Definitions: map[string]*jsonschema.Type{
+							r.Name(): definition,
+						},
+					}
+				}
+
+				return nil
+			}},
 		OpenAPI: OpenAPI{
 			Tags:    []*Tag{},
 			OpenAPI: "3.0.0",
@@ -282,6 +292,17 @@ func (a *API) handleResponse(respDesc string, resp interface{}, i string, ops *O
 		}*/
 
 		for s, t := range schema.Definitions {
+			for _, propKey := range t.Properties.Keys() {
+				prop, _ := t.Properties.Get(propKey)
+				parsed, _ := prop.(*jsonschema.Type)
+				if len(parsed.Definitions) > 0 {
+					for defKey, defValue := range parsed.Definitions {
+						a.OpenAPI.Components.Schemas[defKey] = defValue
+					}
+				}
+				parsed.Definitions = nil
+				t.Properties.Set(propKey, prop)
+			}
 			a.OpenAPI.Components.Schemas[s] = t
 		}
 

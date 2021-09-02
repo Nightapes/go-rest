@@ -13,6 +13,11 @@ func (A APIStatus) GetValues() []interface{} {
 	return []interface{}{ACTIVE, ERROR}
 }
 
+type APIStatuObject struct {
+	Status    APIStatus `json:"status"`
+	OldStatus APIStatus `json:"oldStatus"`
+}
+
 type BaseResponse struct {
 	// human-readable message
 	Message string `json:"message"`
@@ -23,7 +28,7 @@ type BaseResponse struct {
 
 type APIError struct {
 	BaseResponse
-	Status APIStatus       `json:"status"`
+	APIStatuObject
 	Causes map[string]bool `json:"causes"`
 	// Optional error body
 	// ID to identify the request that caused this error
