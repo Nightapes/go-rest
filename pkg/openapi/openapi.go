@@ -127,7 +127,7 @@ func (a *API) Options(option *Options) error {
 func (a *API) Post(option *Post) error {
 	return a.AddPath(http.MethodPost, option.Path, option)
 }
-func (a *API) Put(option *Get) error {
+func (a *API) Put(option *Put) error {
 	return a.AddPath(http.MethodPut, option.Path, option)
 }
 func (a *API) Patch(option *Patch) error {
