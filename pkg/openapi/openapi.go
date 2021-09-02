@@ -3,7 +3,7 @@ package openapi
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/alecthomas/jsonschema"
+	"github.com/Nightapes/go-rest/pkg/jsonschema"
 	"github.com/go-playground/validator/v10"
 
 	"gopkg.in/yaml.v2"
@@ -58,12 +58,6 @@ func NewOpenAPI() *API {
 		handlers: map[string]map[string]HandlerConfig{},
 		jsonschemaRefl: &jsonschema.Reflector{
 			TypeMapper: func(r reflect.Type) *jsonschema.Type {
-				if r.Kind() == reflect.Map {
-					return &jsonschema.Type{
-						Type:                 "object",
-						AdditionalProperties: []byte("true"),
-					}
-				}
 				modelType := reflect.TypeOf((*Enum)(nil)).Elem()
 
 				if r.Implements(modelType) {

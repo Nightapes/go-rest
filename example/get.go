@@ -11,6 +11,10 @@ type User struct {
 	UserID string `json:"userID"`
 }
 
+type User2 struct {
+	UserID string `json:"userID"`
+}
+
 type UserList = []string
 
 var MyGet = &openapi.Get{
@@ -27,6 +31,14 @@ var MyGet = &openapi.Get{
 		"201": {
 			Description: "The response with userID",
 			Value:       &[]User{{"test"}},
+		},
+		"202": {
+			Description: "Map Test",
+			Value: map[string]User2{
+				"test": {
+					UserID: "myID",
+				},
+			},
 		},
 		"204": {
 			Description: "The response with userID",
