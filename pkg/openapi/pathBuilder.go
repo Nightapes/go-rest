@@ -18,6 +18,10 @@ func NewPathBuilder() *PathBuilder {
 	}
 }
 
+func GetPathFromBuilder(p *PathBuilder) string {
+	return p.path
+}
+
 func (p *PathBuilder) Add(segment string) *PathBuilder {
 	p.path = p.path + "/" + strings.TrimLeft(segment, "/")
 	return p
