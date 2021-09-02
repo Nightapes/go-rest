@@ -36,7 +36,7 @@ var MyGet = &openapi.Get{
 	Headers: []openapi.Parameter{{Description: "My custom header", Name: "test-header", Required: false, Type: openapi.INTEGER}},
 	Path: openapi.NewPathBuilder().
 		Add("users").
-		AddParameter("userId", openapi.STRING, "UserID").
+		AddParameter("userId", openapi.TYPEENUM([]string{"aws"}), "UserID").
 		WithQueryParameter("filter", openapi.STRING, "Filter stuff", false),
 	HandlerFunc: func(writer http.ResponseWriter, request *http.Request) {
 		userID := chi.URLParam(request, "userID")

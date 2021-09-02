@@ -133,6 +133,9 @@ func (a *API) Put(option *Get) error {
 func (a *API) Patch(option *Patch) error {
 	return a.AddPath(http.MethodPatch, option.Path, option)
 }
+func (a *API) Delete(option *Delete) error {
+	return a.AddPath(http.MethodDelete, option.Path, option)
+}
 func (a *API) Head(option *Patch) error {
 	return a.AddPath(http.MethodHead, option.Path, option)
 }

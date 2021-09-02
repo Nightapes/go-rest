@@ -7,9 +7,17 @@ type Enum interface {
 type DataType struct {
 	Type   string
 	Format string
+	Enum   *[]string
 }
 
 type TYPE DataType
+
+func TYPEENUM(options []string) TYPE {
+	return TYPE{
+		Type: "string",
+		Enum: &options,
+	}
+}
 
 var (
 	INTEGER = TYPE{
@@ -67,15 +75,20 @@ var (
 )
 
 type Schema struct {
-	Type   string `json:"type,omitempty" yaml:"type,omitempty"`
-	Format string `json:"format,omitempty" yaml:"format,omitempty"`
+	Type   string   `json:"type,omitempty" yaml:"type,omitempty"`
+	Format string   `json:"format,omitempty" yaml:"format,omitempty"`
+	Enum   []string `json:"enum,omitempty" yaml:"enum,omitempty"`
 }
 
-func (t *TYPE) toSchema() *SchemaRef {
+func (e *TYPE) toSchema() *SchemaRef {
+	schema := &Schema{
+		Type:   e.Type,
+		Format: e.Format,
+	}
+	if e.Enum != nil {
+		schema.Enum = *e.Enum
+	}
 	return &SchemaRef{
-		Value: &Schema{
-			Type:   t.Type,
-			Format: t.Format,
-		},
+		Value: schema,
 	}
 }
