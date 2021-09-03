@@ -128,3 +128,22 @@ type BearerAuth struct {
 	Scheme       string `json:"scheme,omitempty" yaml:"scheme,omitempty" validate:"required"`
 	BearerFormat string `json:"bearerFormat,omitempty" yaml:"bearerFormat,omitempty" validate:"required"`
 }
+
+type INTYPES string
+
+const (
+	IN     INTYPES = "header"
+	QUERY  INTYPES = "query"
+	COOKIE INTYPES = "cookie"
+)
+
+type ApiKeyAuth struct {
+	Type string  `json:"type,omitempty" yaml:"type,omitempty" validate:"required"`
+	In   INTYPES `json:"in,omitempty" yaml:"in,omitempty" validate:"required"`
+	Name string  `json:"name,omitempty" yaml:"name,omitempty" validate:"required"`
+}
+
+type OpenIDConnectAuth struct {
+	Type             string `json:"type,omitempty" yaml:"type,omitempty" validate:"required"`
+	OpenIdConnectUrl string `json:"openIdConnectUrl,omitempty" yaml:"openIdConnectUrl,omitempty" validate:"required"`
+}

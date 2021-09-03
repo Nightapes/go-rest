@@ -349,6 +349,29 @@ func (a *API) WithBearerAuth(key, scheme, bearerFormat string) error {
 	return nil
 }
 
+func (a *API) WithApiKey(key string, in INTYPES, name string) error {
+	if _, ok := a.OpenAPI.Components.SecuritySchemes[key]; ok {
+		return fmt.Errorf("a authentication with key %s already exists", key)
+	}
+	a.OpenAPI.Components.SecuritySchemes[key] = &ApiKeyAuth{
+		Type: "apiKey",
+		In:   in,
+		Name: name,
+	}
+	return nil
+}
+
+func (a *API) WithOpenIDConnect(key string, openIdConnectUrl string) error {
+	if _, ok := a.OpenAPI.Components.SecuritySchemes[key]; ok {
+		return fmt.Errorf("a authentication with key %s already exists", key)
+	}
+	a.OpenAPI.Components.SecuritySchemes[key] = &OpenIDConnectAuth{
+		Type:             "openIdConnect",
+		OpenIdConnectUrl: openIdConnectUrl,
+	}
+	return nil
+}
+
 func (a *API) Print() {
 	for key, path := range a.OpenAPI.Paths {
 		fmt.Printf("My path %s \n", key)
