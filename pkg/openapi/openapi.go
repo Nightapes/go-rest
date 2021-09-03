@@ -309,13 +309,16 @@ func (a *API) handleResponse(respDesc string, resp interface{}, i string, ops *O
 }
 
 func (a *API) handleEnumInArrays(t *jsonschema.Type) {
-	parsed := t.Items
-	if len(parsed.Definitions) > 0 {
-		for defKey, defValue := range parsed.Definitions {
+	items := t.Items
+	if items == nil {
+		return
+	}
+	if len(items.Definitions) > 0 {
+		for defKey, defValue := range items.Definitions {
 			a.OpenAPI.Components.Schemas[defKey] = defValue
 		}
 	}
-	parsed.Definitions = nil
+	t.Items.Definitions = nil
 }
 
 func (a *API) handleEnumInProperties(t *jsonschema.Type) {
