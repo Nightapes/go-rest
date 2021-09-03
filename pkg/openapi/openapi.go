@@ -286,17 +286,8 @@ func (a *API) handleResponse(respDesc string, resp interface{}, i string, ops *O
 		}*/
 
 		for s, t := range schema.Definitions {
-			for _, propKey := range t.Properties.Keys() {
-				prop, _ := t.Properties.Get(propKey)
-				parsed, _ := prop.(*jsonschema.Type)
-				if len(parsed.Definitions) > 0 {
-					for defKey, defValue := range parsed.Definitions {
-						a.OpenAPI.Components.Schemas[defKey] = defValue
-					}
-				}
-				parsed.Definitions = nil
-				t.Properties.Set(propKey, prop)
-			}
+			a.handleEnumInProperties(t)
+			a.handleEnumInArrays(t)
 			a.OpenAPI.Components.Schemas[s] = t
 		}
 
@@ -315,6 +306,30 @@ func (a *API) handleResponse(respDesc string, resp interface{}, i string, ops *O
 		}
 	}
 
+}
+
+func (a *API) handleEnumInArrays(t *jsonschema.Type) {
+	parsed := t.Items
+	if len(parsed.Definitions) > 0 {
+		for defKey, defValue := range parsed.Definitions {
+			a.OpenAPI.Components.Schemas[defKey] = defValue
+		}
+	}
+	parsed.Definitions = nil
+}
+
+func (a *API) handleEnumInProperties(t *jsonschema.Type) {
+	for _, propKey := range t.Properties.Keys() {
+		prop, _ := t.Properties.Get(propKey)
+		parsed, _ := prop.(*jsonschema.Type)
+		if len(parsed.Definitions) > 0 {
+			for defKey, defValue := range parsed.Definitions {
+				a.OpenAPI.Components.Schemas[defKey] = defValue
+			}
+		}
+		parsed.Definitions = nil
+		t.Properties.Set(propKey, prop)
+	}
 }
 
 func (a *API) AddServer(url, description string) {
