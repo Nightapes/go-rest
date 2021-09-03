@@ -129,17 +129,17 @@ type BearerAuth struct {
 	BearerFormat string `json:"bearerFormat,omitempty" yaml:"bearerFormat,omitempty" validate:"required"`
 }
 
-type INTYPES string
+type InTypes string
 
 const (
-	IN     INTYPES = "header"
-	QUERY  INTYPES = "query"
-	COOKIE INTYPES = "cookie"
+	HEADER InTypes = "header"
+	QUERY  InTypes = "query"
+	COOKIE InTypes = "cookie"
 )
 
 type ApiKeyAuth struct {
 	Type string  `json:"type,omitempty" yaml:"type,omitempty" validate:"required"`
-	In   INTYPES `json:"in,omitempty" yaml:"in,omitempty" validate:"required"`
+	In   InTypes `json:"in,omitempty" yaml:"in,omitempty" validate:"required"`
 	Name string  `json:"name,omitempty" yaml:"name,omitempty" validate:"required"`
 }
 

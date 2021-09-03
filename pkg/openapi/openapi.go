@@ -349,7 +349,7 @@ func (a *API) WithBearerAuth(key, scheme, bearerFormat string) error {
 	return nil
 }
 
-func (a *API) WithApiKey(key string, in INTYPES, name string) error {
+func (a *API) WithApiKey(key string, in InTypes, name string) error {
 	if _, ok := a.OpenAPI.Components.SecuritySchemes[key]; ok {
 		return fmt.Errorf("a authentication with key %s already exists", key)
 	}
