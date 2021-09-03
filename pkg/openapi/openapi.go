@@ -325,6 +325,7 @@ func (a *API) handleEnumInProperties(t *jsonschema.Type) {
 	for _, propKey := range t.Properties.Keys() {
 		prop, _ := t.Properties.Get(propKey)
 		parsed, _ := prop.(*jsonschema.Type)
+		a.handleEnumInArrays(parsed)
 		if len(parsed.Definitions) > 0 {
 			for defKey, defValue := range parsed.Definitions {
 				a.OpenAPI.Components.Schemas[defKey] = defValue
