@@ -254,6 +254,7 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 			a.OpenAPI.Components.Schemas[s] = t
 		}
 		ops.RequestBody = &RequestBody{
+			Required: true,
 			Content: map[string]*MediaType{
 				"application/json": {Schema: &SchemaRef{Ref: body.Ref}, Example: desc.GetRequestBody()},
 			},
