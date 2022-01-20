@@ -251,6 +251,8 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 	if desc.GetRequestBody() != nil {
 		body := a.jsonschemaRefl.Reflect(desc.GetRequestBody())
 		for s, t := range body.Definitions {
+			a.handleEnumInProperties(t)
+			a.handleEnumInArrays(t)
 			a.OpenAPI.Components.Schemas[s] = t
 		}
 		ops.RequestBody = &RequestBody{
