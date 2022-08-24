@@ -23,6 +23,9 @@ type Parameter struct {
 	Name        string
 	Required    bool
 	Type        TYPE
+	IsArray     bool
+	Style       Style
+	Explode     bool
 }
 
 type PathDesc interface {
@@ -58,34 +61,9 @@ func NewOpenAPI() *API {
 		handlers: map[string]map[string]HandlerConfig{},
 		jsonschemaRefl: &jsonschema.Reflector{
 			TypeMapper: func(r reflect.Type) *jsonschema.Type {
-				modelType := reflect.TypeOf((*Enum)(nil)).Elem()
-
-				if r.Implements(modelType) {
-					enumPointer := reflect.New(r)
-					enumValue := enumPointer.Elem()
-					enumInterface := enumValue.Interface()
-					enumObject := enumInterface.(Enum)
-					if len(enumObject.GetValues()) == 0 {
-						log.Printf("Could not set enum values, no values found in type %s", r.Kind().String())
-						return nil
-					}
-
-					definition := &jsonschema.Type{
-						Enum: enumObject.GetValues(),
-						Type: reflect.TypeOf(enumObject.GetValues()[0]).Kind().String(),
-					}
-
-					return &jsonschema.Type{
-
-						Ref: "#/definitions/" + r.Name(),
-						Definitions: map[string]*jsonschema.Type{
-							r.Name(): definition,
-						},
-					}
-				}
-
-				return nil
+				return enumMapper(r)
 			}},
+
 		OpenAPI: OpenAPI{
 			Tags:    []*Tag{},
 			OpenAPI: "3.0.0",
@@ -95,6 +73,35 @@ func NewOpenAPI() *API {
 				Schemas:         map[string]interface{}{},
 			},
 		}}
+}
+
+func enumMapper(r reflect.Type) *jsonschema.Type {
+	modelType := reflect.TypeOf((*Enum)(nil)).Elem()
+
+	if r.Implements(modelType) {
+		enumPointer := reflect.New(r)
+		enumValue := enumPointer.Elem()
+		enumInterface := enumValue.Interface()
+		enumObject := enumInterface.(Enum)
+		if len(enumObject.GetValues()) == 0 {
+			log.Printf("Could not set enum values, no values found in type %s", r.Kind().String())
+			return nil
+		}
+
+		definition := &jsonschema.Type{
+			Enum: enumObject.GetValues(),
+			Type: reflect.TypeOf(enumObject.GetValues()[0]).Kind().String(),
+		}
+
+		return &jsonschema.Type{
+
+			Ref: "#/definitions/" + r.Name(),
+			Definitions: map[string]*jsonschema.Type{
+				r.Name(): definition,
+			},
+		}
+	}
+	return nil
 }
 
 func (a *API) AddExternalDocs(url, externalDescription string) {
@@ -203,7 +210,7 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 			In:          "path",
 			Deprecated:  false,
 			Required:    parameter.Required,
-			Schema:      parameter.Type.toSchema(),
+			Schema:      parameter.Type.toSchema(parameter.IsArray),
 		})
 	}
 
@@ -214,7 +221,7 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 			In:          "query",
 			Deprecated:  false,
 			Required:    parameter.Required,
-			Schema:      parameter.Type.toSchema(),
+			Schema:      parameter.Type.toSchema(parameter.IsArray),
 		})
 	}
 
@@ -225,7 +232,7 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 			In:          "header",
 			Deprecated:  false,
 			Required:    parameter.Required,
-			Schema:      parameter.Type.toSchema(),
+			Schema:      parameter.Type.toSchema(parameter.IsArray),
 		})
 	}
 
@@ -254,7 +261,10 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 			a.handleEnumInProperties(t)
 			a.handleEnumInArrays(t)
 			a.OpenAPI.Components.Schemas[s] = t
+			t.Definitions = nil
+			t.Version = ""
 		}
+
 		ops.RequestBody = &RequestBody{
 			Required: true,
 			Content: map[string]*MediaType{
@@ -325,6 +335,9 @@ func (a *API) handleEnumInArrays(t *jsonschema.Type) {
 }
 
 func (a *API) handleEnumInProperties(t *jsonschema.Type) {
+	if t.Properties == nil {
+		return
+	}
 	for _, propKey := range t.Properties.Keys() {
 		prop, _ := t.Properties.Get(propKey)
 		parsed, _ := prop.(*jsonschema.Type)
@@ -488,7 +501,8 @@ func (a *API) DefaultResponse(response *MethodResponse) {
 
 func (a *API) patchOpenApi(openapi []byte) []byte {
 	// Replace json definitions with open api schemas
-	patch := strings.ReplaceAll(string(openapi), "#/definitions", "#/components/schemas")
+	patch := strings.ReplaceAll(string(openapi), "#/$defs", "#/components/schemas")
+	patch = strings.ReplaceAll(patch, "#/definitions", "#/components/schemas")
 	// Remove unneeded json draft version
 	patch = strings.ReplaceAll(patch, `"$schema": "http://json-schema.org/draft-04/schema#",`, "")
 	return []byte(patch)
