@@ -7,13 +7,13 @@ type Enum interface {
 type Style string
 
 const (
-	StyleSimple        Style = "simple"
-	StyleLabel         Style = "label"
-	StyleMatrix        Style = "matrix"
-	StyleForm          Style = "form"
-	SpaceDelimited     Style = "spaceDelimited"
-	StylePipeDelimited Style = "pipeDelimited"
-	StyleDeepObject    Style = "deepObject"
+	StyleSimple         Style = "simple"
+	StyleLabel          Style = "label"
+	StyleMatrix         Style = "matrix"
+	StyleForm           Style = "form"
+	StyleSpaceDelimited Style = "spaceDelimited"
+	StylePipeDelimited  Style = "pipeDelimited"
+	StyleDeepObject     Style = "deepObject"
 )
 
 type DataType struct {
