@@ -493,7 +493,6 @@ func (t *Type) stringKeywords(tags []string) {
 				switch val {
 				case "date-time", "email", "hostname", "ipv4", "ipv6", "uri":
 					t.Format = val
-					break
 				}
 			case "default":
 				t.Default = val
@@ -605,11 +604,11 @@ func (t *Type) setExtra(key, val string) {
 		t.Extras = map[string]interface{}{}
 	}
 	if existingVal, ok := t.Extras[key]; ok {
-		switch existingVal.(type) {
+		switch existingVal := existingVal.(type) {
 		case string:
-			t.Extras[key] = []string{existingVal.(string), val}
+			t.Extras[key] = []string{existingVal, val}
 		case []string:
-			t.Extras[key] = append(existingVal.([]string), val)
+			t.Extras[key] = append(existingVal, val)
 		case int:
 			t.Extras[key], _ = strconv.Atoi(val)
 		}

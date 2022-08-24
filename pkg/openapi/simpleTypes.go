@@ -4,6 +4,18 @@ type Enum interface {
 	GetValues() []interface{}
 }
 
+type Style string
+
+const (
+	StyleSimple        Style = "simple"
+	StyleLabel         Style = "label"
+	StyleMatrix        Style = "matrix"
+	StyleForm          Style = "form"
+	SpaceDelimited     Style = "spaceDelimited"
+	StylePipeDelimited Style = "pipeDelimited"
+	StyleDeepObject    Style = "deepObject"
+)
+
 type DataType struct {
 	Type   string
 	Format string
@@ -78,9 +90,11 @@ type Schema struct {
 	Type   string   `json:"type,omitempty" yaml:"type,omitempty"`
 	Format string   `json:"format,omitempty" yaml:"format,omitempty"`
 	Enum   []string `json:"enum,omitempty" yaml:"enum,omitempty"`
+	Items  *Schema  `json:"items,omitempty" yaml:"items,omitempty"`
 }
 
-func (e *TYPE) toSchema() *SchemaRef {
+func (e *TYPE) toSchema(isArray bool) *SchemaRef {
+
 	schema := &Schema{
 		Type:   e.Type,
 		Format: e.Format,
@@ -88,7 +102,14 @@ func (e *TYPE) toSchema() *SchemaRef {
 	if e.Enum != nil {
 		schema.Enum = *e.Enum
 	}
+
+	if !isArray {
+		return &SchemaRef{
+			Value: schema,
+		}
+	}
+
 	return &SchemaRef{
-		Value: schema,
+		Value: &Schema{Type: "array", Items: schema},
 	}
 }
