@@ -24,6 +24,8 @@ func main() {
 	})
 	err = api.Get(MyGet)
 	checkErr(err)
+	err = api.Post(MyPost)
+	checkErr(err)
 	authMiddleware := api.ChiAuthMiddleware(func(authName string, scopes []string, r *http.Request) bool {
 		log.Printf("Auth check %s %s", authName, scopes)
 		return authName != "mybearer"

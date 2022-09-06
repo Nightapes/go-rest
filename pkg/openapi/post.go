@@ -4,6 +4,19 @@ import (
 	"net/http"
 )
 
+type RequestBodies struct {
+	Description string
+	Required    bool
+	Bodies      map[string]interface{}
+}
+
+type FileUpload string
+
+const (
+	FileUploadBinary FileUpload = "binary"
+	FileUploadBase64 FileUpload = "base64"
+)
+
 type Post struct {
 	Summary        string
 	Description    string
@@ -13,7 +26,9 @@ type Post struct {
 	Response       map[string]MethodResponse
 	Path           *PathBuilder
 	Headers        []Parameter
-	RequestBody    interface{}
+	// Deprecated: Please migrate to RequestBodies
+	RequestBody   interface{}
+	RequestBodies *RequestBodies
 	http.HandlerFunc
 }
 
@@ -47,8 +62,21 @@ func (m *Post) GetHeaders() []Parameter {
 	return m.Headers
 }
 
-func (m *Post) GetRequestBody() interface{} {
-	return m.RequestBody
+func (m *Post) GetRequestBodies() *RequestBodies {
+	if m.RequestBodies != nil {
+		return m.RequestBodies
+	}
+
+	if m.RequestBody != nil {
+		return &RequestBodies{
+			Required: true,
+			Bodies: map[string]interface{}{
+				"application/json": m.RequestBody,
+			},
+		}
+	}
+
+	return nil
 }
 
 func (m *Post) GetTags() []string {
