@@ -7,7 +7,9 @@ import (
 	"net/http"
 )
 
-var example = []string{}
+type test struct {
+	Test string
+}
 
 var MyPost = &openapi.Post{
 	Summary:        "Post User",
@@ -19,7 +21,7 @@ var MyPost = &openapi.Post{
 		Description: "Test",
 		Required:    true,
 		Bodies: map[string]interface{}{
-			"application/json": &example,
+			"application/json": &test{},
 			"application/xml":  openapi.FileUploadBinary,
 		},
 	},

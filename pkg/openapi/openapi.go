@@ -259,12 +259,11 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 		content := map[string]*MediaType{}
 
 		for mediaType, requestBody := range desc.GetRequestBodies().Bodies {
-
 			if tmp, ok := requestBody.(FileUpload); ok {
 				content[mediaType] = &MediaType{Schema: &Schema{
 					Type:   "string",
 					Format: string(tmp),
-				}, Example: requestBody}
+				}}
 				continue
 			}
 
@@ -277,7 +276,7 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 				t.Version = ""
 			}
 
-			content[mediaType] = &MediaType{Schema: &Schema{Ref: body.Ref}, Example: requestBody}
+			content[mediaType] = &MediaType{Schema: &SchemaRef{Ref: body.Ref}, Example: requestBody}
 
 		}
 		ops.RequestBody = &RequestBody{
@@ -321,7 +320,7 @@ func (a *API) handleResponse(respDesc string, resp interface{}, i string, ops *O
 
 		ops.Responses[i] = &Response{
 			Content: map[string]*MediaType{
-				"application/json": {Schema: &Schema{Value: schema.Type}, Example: resp},
+				"application/json": {Schema: &SchemaRef{Value: schema.Type}, Example: resp},
 			},
 			Description: respDesc,
 		}
