@@ -42,7 +42,7 @@ func (m *Head) GetHeaders() []Parameter {
 	return m.Headers
 }
 
-func (m *Head) GetRequestBody() interface{} {
+func (m *Head) GetRequestBodies() *RequestBodies {
 	return nil
 }
 

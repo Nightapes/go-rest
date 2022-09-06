@@ -42,7 +42,7 @@ func (m *Trace) GetHeaders() []Parameter {
 	return m.Headers
 }
 
-func (m *Trace) GetRequestBody() interface{} {
+func (m *Trace) GetRequestBodies() *RequestBodies {
 	return nil
 }
 

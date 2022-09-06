@@ -87,10 +87,12 @@ var (
 )
 
 type Schema struct {
-	Type   string   `json:"type,omitempty" yaml:"type,omitempty"`
-	Format string   `json:"format,omitempty" yaml:"format,omitempty"`
-	Enum   []string `json:"enum,omitempty" yaml:"enum,omitempty"`
-	Items  *Schema  `json:"items,omitempty" yaml:"items,omitempty"`
+	Ref    string      `json:"$ref,omitempty" yaml:"$ref,omitempty"`
+	Value  interface{} `json:"value,omitempty" yaml:"value,omitempty"`
+	Type   string      `json:"type,omitempty" yaml:"type,omitempty"`
+	Format string      `json:"format,omitempty" yaml:"format,omitempty"`
+	Enum   []string    `json:"enum,omitempty" yaml:"enum,omitempty"`
+	Items  *Schema     `json:"items,omitempty" yaml:"items,omitempty"`
 }
 
 func (e *TYPE) toSchema(isArray bool) *SchemaRef {

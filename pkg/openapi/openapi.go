@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/Nightapes/go-rest/pkg/jsonschema"
 	"github.com/go-playground/validator/v10"
-
 	"gopkg.in/yaml.v2"
 	"log"
 	"net/http"
@@ -35,7 +34,7 @@ type PathDesc interface {
 	GetResponse(string) (string, interface{})
 	GetAuthentication(key string) (bool, []string)
 	GetHeaders() []Parameter
-	GetRequestBody() interface{}
+	GetRequestBodies() *RequestBodies
 	GetTags() []string
 	GetHandlerFunc() http.HandlerFunc
 }
@@ -255,22 +254,38 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 		}
 	}
 
-	if desc.GetRequestBody() != nil {
-		body := a.jsonschemaRefl.Reflect(desc.GetRequestBody())
-		for s, t := range body.Definitions {
-			a.handleEnumInProperties(t)
-			a.handleEnumInArrays(t)
-			a.OpenAPI.Components.Schemas[s] = t
-			t.Definitions = nil
-			t.Version = ""
+	if desc.GetRequestBodies() != nil {
+
+		content := map[string]*MediaType{}
+
+		for mediaType, requestBody := range desc.GetRequestBodies().Bodies {
+
+			if tmp, ok := requestBody.(FileUpload); ok {
+				content[mediaType] = &MediaType{Schema: &Schema{
+					Type:   "string",
+					Format: string(tmp),
+				}, Example: requestBody}
+				continue
+			}
+
+			body := a.jsonschemaRefl.Reflect(requestBody)
+			for s, t := range body.Definitions {
+				a.handleEnumInProperties(t)
+				a.handleEnumInArrays(t)
+				a.OpenAPI.Components.Schemas[s] = t
+				t.Definitions = nil
+				t.Version = ""
+			}
+
+			content[mediaType] = &MediaType{Schema: &Schema{Ref: body.Ref}, Example: requestBody}
+
+		}
+		ops.RequestBody = &RequestBody{
+			Required:    desc.GetRequestBodies().Required,
+			Description: desc.GetRequestBodies().Description,
+			Content:     content,
 		}
 
-		ops.RequestBody = &RequestBody{
-			Required: true,
-			Content: map[string]*MediaType{
-				"application/json": {Schema: &SchemaRef{Ref: body.Ref}, Example: desc.GetRequestBody()},
-			},
-		}
 	}
 
 	if a.defaultResponse != nil {
@@ -306,7 +321,7 @@ func (a *API) handleResponse(respDesc string, resp interface{}, i string, ops *O
 
 		ops.Responses[i] = &Response{
 			Content: map[string]*MediaType{
-				"application/json": {Schema: &SchemaRef{Value: schema.Type}, Example: resp},
+				"application/json": {Schema: &Schema{Value: schema.Type}, Example: resp},
 			},
 			Description: respDesc,
 		}

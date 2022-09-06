@@ -13,7 +13,6 @@ type Delete struct {
 	Response       map[string]MethodResponse
 	Path           *PathBuilder
 	Headers        []Parameter
-	RequestBody    interface{}
 	http.HandlerFunc
 }
 
@@ -47,7 +46,7 @@ func (m *Delete) GetHeaders() []Parameter {
 	return m.Headers
 }
 
-func (m *Delete) GetRequestBody() interface{} {
+func (m *Delete) GetRequestBodies() *RequestBodies {
 	return nil
 }
 

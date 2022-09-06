@@ -13,7 +13,9 @@ type Put struct {
 	Response       map[string]MethodResponse
 	Path           *PathBuilder
 	Headers        []Parameter
-	RequestBody    interface{}
+	// Deprecated: Please migrate to RequestBodies
+	RequestBody   interface{}
+	RequestBodies *RequestBodies
 	http.HandlerFunc
 }
 
@@ -47,8 +49,21 @@ func (m *Put) GetHeaders() []Parameter {
 	return m.Headers
 }
 
-func (m *Put) GetRequestBody() interface{} {
-	return m.RequestBody
+func (m *Put) GetRequestBodies() *RequestBodies {
+	if m.RequestBodies != nil {
+		return m.RequestBodies
+	}
+
+	if m.RequestBody != nil {
+		return &RequestBodies{
+			Required: true,
+			Bodies: map[string]interface{}{
+				"application/json": m.RequestBody,
+			},
+		}
+	}
+
+	return nil
 }
 
 func (m *Put) GetTags() []string {

@@ -7,22 +7,22 @@ import (
 	"net/http"
 )
 
-type User struct {
-	UserID string `json:"userID"`
-}
+var example = []string{}
 
-type User2 struct {
-	UserID string `json:"userID"`
-}
-
-type UserList = []string
-
-var MyGet = &openapi.Get{
-	Summary:        "Get User",
-	Description:    "Get User with given ID",
-	OperationID:    "GetMyTest",
+var MyPost = &openapi.Post{
+	Summary:        "Post User",
+	Description:    "Post User with given ID",
+	OperationID:    "PostMyTest",
 	Tags:           []string{"UserService"},
 	Authentication: map[string][]string{"mybasic": nil, "mybearer": {"users:read"}},
+	RequestBodies: &openapi.RequestBodies{
+		Description: "Test",
+		Required:    true,
+		Bodies: map[string]interface{}{
+			"application/json": &example,
+			"application/xml":  openapi.FileUploadBinary,
+		},
+	},
 	Response: map[string]openapi.MethodResponse{
 		"200": {
 			Description: "The response with userID",
@@ -48,7 +48,6 @@ var MyGet = &openapi.Get{
 	Path: openapi.NewPathBuilder().
 		Add("users").
 		AddParameter("userId", openapi.TYPEENUM([]string{"aws"}), "UserID").
-		AddParameterList("ids", openapi.STRING, "DDDD", nil).
 		WithQueryParameter("filter", openapi.STRING, "Filter stuff", false),
 	HandlerFunc: func(writer http.ResponseWriter, request *http.Request) {
 		userID := chi.URLParam(request, "userID")

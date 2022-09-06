@@ -46,7 +46,7 @@ func (m *Options) GetHeaders() []Parameter {
 	return m.Headers
 }
 
-func (m *Options) GetRequestBody() interface{} {
+func (m *Options) GetRequestBodies() *RequestBodies {
 	return nil
 }
 
