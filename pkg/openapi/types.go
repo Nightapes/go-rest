@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"encoding/json"
 	"github.com/getkin/kin-openapi/jsoninfo"
 )
 
@@ -91,15 +92,53 @@ type MediaType struct {
 }
 
 type Operation struct {
-	Tags        []string              `json:"tags,omitempty" yaml:"tags,omitempty"`
-	Summary     string                `json:"summary,omitempty" yaml:"summary,omitempty"`
-	Description string                `json:"description,omitempty" yaml:"description,omitempty"`
-	OperationID string                `json:"operationId,omitempty" yaml:"operationId,omitempty"`
-	Deprecated  bool                  `json:"deprecated,omitempty" yaml:"deprecated,omitempty"`
-	Responses   map[string]*Response  `json:"responses" yaml:"responses" validate:"required"`
-	Security    []map[string][]string `json:"security,omitempty" yaml:"security,omitempty"`
-	RequestBody *RequestBody          `json:"requestBody,omitempty" yaml:"requestBody,omitempty"`
-	Parameters  []GenericParameter    `json:"parameters,omitempty" yaml:"parameters,omitempty"`
+	Tags        []string               `json:"tags,omitempty" yaml:"tags,omitempty"`
+	Summary     string                 `json:"summary,omitempty" yaml:"summary,omitempty"`
+	Description string                 `json:"description,omitempty" yaml:"description,omitempty"`
+	OperationID string                 `json:"operationId,omitempty" yaml:"operationId,omitempty"`
+	Deprecated  bool                   `json:"deprecated,omitempty" yaml:"deprecated,omitempty"`
+	Responses   map[string]*Response   `json:"responses" yaml:"responses" validate:"required"`
+	Security    []map[string][]string  `json:"security,omitempty" yaml:"security,omitempty"`
+	RequestBody *RequestBody           `json:"requestBody,omitempty" yaml:"requestBody,omitempty"`
+	Parameters  []GenericParameter     `json:"parameters,omitempty" yaml:"parameters,omitempty"`
+	extensions  map[string]interface{} `json:"-" yaml:"-"`
+}
+
+func (u *Operation) MarshalJSON() ([]byte, error) {
+	b, err := json.Marshal(&struct {
+		Tags        []string              `json:"tags,omitempty" yaml:"tags,omitempty"`
+		Summary     string                `json:"summary,omitempty" yaml:"summary,omitempty"`
+		Description string                `json:"description,omitempty" yaml:"description,omitempty"`
+		OperationID string                `json:"operationId,omitempty" yaml:"operationId,omitempty"`
+		Deprecated  bool                  `json:"deprecated,omitempty" yaml:"deprecated,omitempty"`
+		Responses   map[string]*Response  `json:"responses" yaml:"responses" validate:"required"`
+		Security    []map[string][]string `json:"security,omitempty" yaml:"security,omitempty"`
+		RequestBody *RequestBody          `json:"requestBody,omitempty" yaml:"requestBody,omitempty"`
+		Parameters  []GenericParameter    `json:"parameters,omitempty" yaml:"parameters,omitempty"`
+	}{
+		Tags:        u.Tags,
+		Summary:     u.Summary,
+		Description: u.Description,
+		OperationID: u.Description,
+		Deprecated:  u.Deprecated,
+		Responses:   u.Responses,
+		Security:    u.Security,
+		RequestBody: u.RequestBody,
+		Parameters:  u.Parameters,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var m map[string]interface{}
+	_ = json.Unmarshal(b, &m)
+
+	for i, extension := range u.extensions {
+		m[i] = extension
+	}
+
+	return json.Marshal(m)
 }
 
 type GenericParameter struct {
@@ -147,3 +186,5 @@ type OpenIDConnectAuth struct {
 	Type             string `json:"type,omitempty" yaml:"type,omitempty" validate:"required"`
 	OpenIdConnectUrl string `json:"openIdConnectUrl,omitempty" yaml:"openIdConnectUrl,omitempty" validate:"required"`
 }
+
+type Extensions map[string]interface{}

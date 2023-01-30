@@ -12,6 +12,7 @@ type Head struct {
 	Authentication map[string][]string
 	Path           *PathBuilder
 	Headers        []Parameter
+	Extensions
 	http.HandlerFunc
 }
 
@@ -25,6 +26,10 @@ func (m *Head) GetOperationID() string {
 
 func (m *Head) GetDescription() string {
 	return m.Description
+}
+
+func (m *Head) GetExtensions() map[string]interface{} {
+	return m.Extensions
 }
 
 func (m *Head) GetResponse(s string) (string, interface{}) {
