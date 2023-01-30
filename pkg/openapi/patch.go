@@ -16,6 +16,7 @@ type Patch struct {
 	// Deprecated: Please migrate to RequestBodies
 	RequestBody   interface{}
 	RequestBodies *RequestBodies
+	Extensions
 	http.HandlerFunc
 }
 
@@ -29,6 +30,10 @@ func (m *Patch) GetOperationID() string {
 
 func (m *Patch) GetDescription() string {
 	return m.Description
+}
+
+func (m *Patch) GetExtensions() map[string]interface{} {
+	return m.Extensions
 }
 
 func (m *Patch) GetResponse(s string) (string, interface{}) {

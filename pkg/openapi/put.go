@@ -16,6 +16,7 @@ type Put struct {
 	// Deprecated: Please migrate to RequestBodies
 	RequestBody   interface{}
 	RequestBodies *RequestBodies
+	Extensions
 	http.HandlerFunc
 }
 
@@ -29,6 +30,10 @@ func (m *Put) GetOperationID() string {
 
 func (m *Put) GetDescription() string {
 	return m.Description
+}
+
+func (m *Put) GetExtensions() map[string]interface{} {
+	return m.Extensions
 }
 
 func (m *Put) GetResponse(s string) (string, interface{}) {

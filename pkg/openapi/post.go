@@ -29,6 +29,7 @@ type Post struct {
 	// Deprecated: Please migrate to RequestBodies
 	RequestBody   interface{}
 	RequestBodies *RequestBodies
+	Extensions
 	http.HandlerFunc
 }
 
@@ -38,6 +39,10 @@ func (m *Post) GetSummary() string {
 
 func (m *Post) GetOperationID() string {
 	return m.OperationID
+}
+
+func (m *Post) GetExtensions() map[string]interface{} {
+	return m.Extensions
 }
 
 func (m *Post) GetDescription() string {

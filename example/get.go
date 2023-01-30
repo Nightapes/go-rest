@@ -23,6 +23,7 @@ var MyGet = &openapi.Get{
 	OperationID:    "GetMyTest",
 	Tags:           []string{"UserService"},
 	Authentication: map[string][]string{"mybasic": nil, "mybearer": {"users:read"}},
+	Extensions:     map[string]interface{}{"x-custom": "test", "x-custom1": map[string]string{"test": "test"}},
 	Response: map[string]openapi.MethodResponse{
 		"200": {
 			Description: "The response with userID",

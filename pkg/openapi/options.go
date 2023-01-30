@@ -13,6 +13,7 @@ type Options struct {
 	Response       map[string]MethodResponse
 	Path           *PathBuilder
 	Headers        []Parameter
+	Extensions
 	http.HandlerFunc
 }
 
@@ -26,6 +27,10 @@ func (m *Options) GetOperationID() string {
 
 func (m *Options) GetDescription() string {
 	return m.Description
+}
+
+func (m *Options) GetExtensions() map[string]interface{} {
+	return m.Extensions
 }
 
 func (m *Options) GetResponse(s string) (string, interface{}) {

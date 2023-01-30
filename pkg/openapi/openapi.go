@@ -35,6 +35,7 @@ type PathDesc interface {
 	GetAuthentication(key string) (bool, []string)
 	GetHeaders() []Parameter
 	GetRequestBodies() *RequestBodies
+	GetExtensions() map[string]interface{}
 	GetTags() []string
 	GetHandlerFunc() http.HandlerFunc
 }
@@ -200,6 +201,7 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 		OperationID: desc.GetOperationID(),
 		Deprecated:  false,
 		Security:    []map[string][]string{},
+		extensions:  desc.GetExtensions(),
 	}
 
 	for _, parameter := range pathBuilder.parameters {

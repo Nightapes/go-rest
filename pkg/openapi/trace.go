@@ -12,6 +12,7 @@ type Trace struct {
 	Authentication map[string][]string
 	Path           *PathBuilder
 	Headers        []Parameter
+	Extensions
 	http.HandlerFunc
 }
 
@@ -25,6 +26,10 @@ func (m *Trace) GetOperationID() string {
 
 func (m *Trace) GetDescription() string {
 	return m.Description
+}
+
+func (m *Trace) GetExtensions() map[string]interface{} {
+	return m.Extensions
 }
 
 func (m *Trace) GetResponse(s string) (string, interface{}) {

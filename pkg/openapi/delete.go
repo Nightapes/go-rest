@@ -13,6 +13,7 @@ type Delete struct {
 	Response       map[string]MethodResponse
 	Path           *PathBuilder
 	Headers        []Parameter
+	Extensions
 	http.HandlerFunc
 }
 
@@ -26,6 +27,10 @@ func (m *Delete) GetOperationID() string {
 
 func (m *Delete) GetDescription() string {
 	return m.Description
+}
+
+func (m *Delete) GetExtensions() map[string]interface{} {
+	return m.Extensions
 }
 
 func (m *Delete) GetResponse(s string) (string, interface{}) {
