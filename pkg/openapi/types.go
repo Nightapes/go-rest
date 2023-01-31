@@ -119,7 +119,7 @@ func (u *Operation) MarshalJSON() ([]byte, error) {
 		Tags:        u.Tags,
 		Summary:     u.Summary,
 		Description: u.Description,
-		OperationID: u.Description,
+		OperationID: u.OperationID,
 		Deprecated:  u.Deprecated,
 		Responses:   u.Responses,
 		Security:    u.Security,
