@@ -2,7 +2,7 @@ package openapi
 
 import (
 	"encoding/json"
-	"github.com/getkin/kin-openapi/jsoninfo"
+	"github.com/Nightapes/go-rest/internal/utils"
 )
 
 type OpenAPI struct {
@@ -65,11 +65,11 @@ type SchemaRef struct {
 }
 
 func (value *SchemaRef) MarshalJSON() ([]byte, error) {
-	return jsoninfo.MarshalRef(value.Ref, value.Value)
+	return utils.MarshalRef(value.Ref, value.Value)
 }
 
 func (value *SchemaRef) UnmarshalJSON(data []byte) error {
-	return jsoninfo.UnmarshalRef(data, &value.Ref, &value.Value)
+	return utils.UnmarshalRef(data, &value.Ref, &value.Value)
 }
 
 type SchemaRefs []*SchemaRef
