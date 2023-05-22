@@ -20,7 +20,7 @@ func (a *API) ChiAuthMiddleware(isAllowed func(authName string, scopes []string,
 					w.WriteHeader(http.StatusMethodNotAllowed)
 					return
 				}
-				authTypes := config[rctx.RouteMethod].authTypes
+				authTypes := config[rctx.RouteMethod].AuthTypes
 				for name, scopes := range authTypes {
 					if isAllowed(name, scopes, r) {
 						isAuthenticated = true

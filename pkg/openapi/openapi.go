@@ -44,7 +44,7 @@ type HandlerConfig struct {
 	Method      string
 	Path        string
 	HandlerFunc http.HandlerFunc
-	authTypes   map[string][]string
+	AuthTypes   map[string][]string
 }
 
 type API struct {
@@ -240,7 +240,7 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 	handlerConfig := &HandlerConfig{
 		Path:        pathBuilder.path,
 		HandlerFunc: desc.GetHandlerFunc(),
-		authTypes:   map[string][]string{},
+		AuthTypes:   map[string][]string{},
 	}
 
 	for s := range a.OpenAPI.Components.SecuritySchemes {
@@ -252,7 +252,7 @@ func (a *API) toPath(desc PathDesc, pathBuilder *PathBuilder) (*Operation, *Hand
 				s: scopes,
 			}
 			ops.Security = append(ops.Security, sec)
-			handlerConfig.authTypes[s] = scopes
+			handlerConfig.AuthTypes[s] = scopes
 		}
 	}
 
